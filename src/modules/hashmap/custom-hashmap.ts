@@ -1,9 +1,9 @@
-import { 
-  HashmapOptions, 
-  HashmapNode, 
-  HashFunction, 
+import {
+  HashmapOptions,
+  HashmapNode,
+  HashFunction,
   EqualsFunction,
-  HASHMAP_CONSTANTS 
+  HASHMAP_CONSTANTS,
 } from './types';
 import { HashUtils } from './hash-utils';
 
@@ -17,13 +17,13 @@ export class CustomHashmap<K, V> {
 
   constructor(options?: HashmapOptions<K>) {
     this.capacity = Math.max(
-      HASHMAP_CONSTANTS.MIN_CAPACITY, 
-      options?.initialCapacity ?? HASHMAP_CONSTANTS.DEFAULT_CAPACITY
+      HASHMAP_CONSTANTS.MIN_CAPACITY,
+      options?.initialCapacity ?? HASHMAP_CONSTANTS.DEFAULT_CAPACITY,
     );
     this.loadFactor = options?.loadFactor ?? HASHMAP_CONSTANTS.DEFAULT_LOAD_FACTOR;
     this.hashFunction = options?.hashFunction;
     this.equalsFunction = options?.equalsFunction ?? ((a, b) => a === b);
-    
+
     this.buckets = new Array(this.capacity).fill(null);
   }
 
@@ -33,15 +33,15 @@ export class CustomHashmap<K, V> {
 
   set(key: K, value: V): void {
     this.validateKey(key);
-    
+
     const bucketIndex = this.getBucketIndex(key);
     const existingNode = this.findNodeInBucket(bucketIndex, key);
-    
+
     if (existingNode) {
       existingNode.value = value;
       return;
     }
-    
+
     this.insertNewNode(bucketIndex, key, value);
     this.resizeIfNeeded();
   }
@@ -104,14 +104,14 @@ export class CustomHashmap<K, V> {
 
   private findNodeInBucket(bucketIndex: number, key: K): HashmapNode<K, V> | null {
     let currentNode = this.buckets[bucketIndex];
-    
+
     while (currentNode) {
       if (this.equalsFunction(currentNode.key, key)) {
         return currentNode;
       }
       currentNode = currentNode.next;
     }
-    
+
     return null;
   }
 
@@ -119,9 +119,9 @@ export class CustomHashmap<K, V> {
     const newNode: HashmapNode<K, V> = {
       key,
       value,
-      next: this.buckets[bucketIndex]
+      next: this.buckets[bucketIndex],
     };
-    
+
     this.buckets[bucketIndex] = newNode;
     this._size++;
   }
@@ -129,7 +129,7 @@ export class CustomHashmap<K, V> {
   private deleteFromBucket(bucketIndex: number, key: K): boolean {
     let currentNode = this.buckets[bucketIndex];
     let previousNode: HashmapNode<K, V> | null = null;
-    
+
     while (currentNode) {
       if (this.equalsFunction(currentNode.key, key)) {
         if (previousNode) {
@@ -140,11 +140,11 @@ export class CustomHashmap<K, V> {
         this._size--;
         return true;
       }
-      
+
       previousNode = currentNode;
       currentNode = currentNode.next;
     }
-    
+
     return false;
   }
 
@@ -156,18 +156,18 @@ export class CustomHashmap<K, V> {
 
   private resize(newCapacity: number): void {
     const oldBuckets = this.buckets;
-    
+
     this.capacity = Math.max(HASHMAP_CONSTANTS.MIN_CAPACITY, Math.floor(newCapacity));
     this.buckets = new Array(this.capacity).fill(null);
     this._size = 0;
-    
+
     this.rehashAllNodes(oldBuckets);
   }
 
   private rehashAllNodes(oldBuckets: Array<HashmapNode<K, V> | null>): void {
     for (const bucket of oldBuckets) {
       let currentNode = bucket;
-      
+
       while (currentNode) {
         this.insertNodeWithoutResize(currentNode.key, currentNode.value);
         currentNode = currentNode.next;
@@ -183,7 +183,7 @@ export class CustomHashmap<K, V> {
   private forEachNode(callback: (node: HashmapNode<K, V>) => void): void {
     for (const bucket of this.buckets) {
       let currentNode = bucket;
-      
+
       while (currentNode) {
         callback(currentNode);
         currentNode = currentNode.next;

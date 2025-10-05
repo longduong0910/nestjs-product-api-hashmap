@@ -16,10 +16,5 @@ export class HashmapModule {}
 
 export { CustomHashmap } from './custom-hashmap';
 export { HashUtils } from './hash-utils';
-export type { 
-  HashFunction, 
-  EqualsFunction, 
-  HashmapOptions, 
-  HashmapNode 
-} from './types';
+export type { HashFunction, EqualsFunction, HashmapOptions, HashmapNode } from './types';
 export { HASHMAP_CONSTANTS } from './types';

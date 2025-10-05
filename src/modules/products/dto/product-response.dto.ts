@@ -10,7 +10,10 @@ export class ProductResponseDto {
   @ApiProperty({ description: 'Product name', example: 'Laptop Pro' })
   name: string;
 
-  @ApiPropertyOptional({ description: 'Product description', example: 'High-performance laptop for professionals' })
+  @ApiPropertyOptional({
+    description: 'Product description',
+    example: 'High-performance laptop for professionals',
+  })
   description?: string;
 
   @ApiProperty({ description: 'Product price', example: 1299.99 })
@@ -25,10 +28,16 @@ export class ProductResponseDto {
   @ApiPropertyOptional({ description: 'Thumbnail URL', example: 'https://example.com/thumb.jpg' })
   thumbnailUrl?: string;
 
-  @ApiPropertyOptional({ description: 'Product attributes', example: { color: 'black', weight: 2.5 } })
+  @ApiPropertyOptional({
+    description: 'Product attributes',
+    example: { color: 'black', weight: 2.5 },
+  })
   attributes?: Record<string, string | number | boolean>;
 
-  @ApiPropertyOptional({ description: 'Product tags', example: ['laptop', 'technology', 'portable'] })
+  @ApiPropertyOptional({
+    description: 'Product tags',
+    example: ['laptop', 'technology', 'portable'],
+  })
   tags?: string[];
 
   @ApiProperty({ description: 'Product status', example: 'active' })
@@ -68,23 +77,5 @@ export class ProductResponseDto {
     this.status = status;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-  }
-
-  static fromEntity(product: any): ProductResponseDto {
-    return new ProductResponseDto(
-      product.id,
-      product.sku,
-      product.name,
-      product.price,
-      product.stockQuantity,
-      product.status,
-      product.createdAt,
-      product.updatedAt,
-      product.description,
-      product.category,
-      product.thumbnailUrl,
-      product.attributes,
-      product.tags,
-    );
   }
 }

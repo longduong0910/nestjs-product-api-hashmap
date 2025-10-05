@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../../database/entities/product.entity';
-import { ICreateProduct, IUpdateProduct } from './interfaces';
 
 @Injectable()
 export class ProductsRepository {
@@ -21,14 +20,14 @@ export class ProductsRepository {
     return result ?? null;
   }
 
-  async create(productData: ICreateProduct | Partial<Product>): Promise<Product> {
-    const product = this.productRepository.create(productData as Partial<Product>);
+  async create(productData: Partial<Product>): Promise<Product> {
+    const product = this.productRepository.create(productData);
     const saved = await this.productRepository.save(product);
     return saved;
   }
 
-  async update(id: string, productData: IUpdateProduct | Partial<Product>): Promise<Product | null> {
-    await this.productRepository.update(id, productData as Partial<Product>);
+  async update(id: string, productData: Partial<Product>): Promise<Product | null> {
+    await this.productRepository.update(id, productData);
     return this.findById(id);
   }
 
@@ -40,10 +39,5 @@ export class ProductsRepository {
   async findByCategory(category: string): Promise<Product[]> {
     const results = await this.productRepository.find({ where: { category } });
     return results;
-  }
-
-  async findBySku(sku: string): Promise<Product | null> {
-    const result = await this.productRepository.findOne({ where: { sku } });
-    return result ?? null;
   }
 }

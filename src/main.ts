@@ -1,9 +1,8 @@
 // Crypto polyfill for TypeORM compatibility with Node.js v18.17.0
 import { randomUUID } from 'crypto';
 if (!global.crypto) {
-  const uuid = require('uuid');
   global.crypto = {
-    randomUUID: () => uuid.v4(),
+    randomUUID,
   } as any;
 }
 
@@ -14,13 +13,15 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // Enable validation pipes globally
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Enable CORS
   app.enableCors();
@@ -28,12 +29,14 @@ async function bootstrap() {
   // Setup Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('Product API with Custom Hashmap')
-    .setDescription('A NestJS API for product management with custom hashmap implementation and file attachments')
+    .setDescription(
+      'A NestJS API for product management with custom hashmap implementation and file attachments',
+    )
     .setVersion('1.0')
     .addTag('products', 'Product management endpoints')
     .addTag('attachments', 'File attachment and directory tree endpoints')
     .build();
-    
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
@@ -42,4 +45,4 @@ async function bootstrap() {
   console.log(`Application is running on: http://localhost:${port}`);
   console.log(`Swagger documentation available at: http://localhost:${port}/swagger`);
 }
-bootstrap();
+void bootstrap();

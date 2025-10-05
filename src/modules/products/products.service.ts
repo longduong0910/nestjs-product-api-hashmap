@@ -17,9 +17,9 @@ export class ProductsService {
       price: entity.price,
       category: entity.category,
       // include optional fields if present on the entity
-      ...(entity as any).description ? { description: (entity as any).description } : {},
-      ...(entity as any).createdAt ? { createdAt: (entity as any).createdAt } : {},
-      ...(entity as any).updatedAt ? { updatedAt: (entity as any).updatedAt } : {},
+      ...((entity as any).description ? { description: (entity as any).description } : {}),
+      ...((entity as any).createdAt ? { createdAt: (entity as any).createdAt } : {}),
+      ...((entity as any).updatedAt ? { updatedAt: (entity as any).updatedAt } : {}),
     } as IProduct;
   }
 

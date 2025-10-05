@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  UseInterceptors,
-  UploadedFiles,
-  Body,
-  Get,
-} from '@nestjs/common';
+import { Controller, Post, UseInterceptors, UploadedFiles, Body, Get } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
@@ -20,9 +13,9 @@ export class AttachmentsController {
   constructor(private readonly attachmentsService: AttachmentsService) {}
 
   @Post('upload')
-  @ApiOperation({ 
-    summary: 'Upload multiple files', 
-    description: 'Upload multiple files to the server and store metadata using custom hashmap' 
+  @ApiOperation({
+    summary: 'Upload multiple files',
+    description: 'Upload multiple files to the server and store metadata using custom hashmap',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -44,7 +37,11 @@ export class AttachmentsController {
       },
     },
   })
-  @ApiResponse({ status: 201, description: 'Files successfully uploaded', type: [AttachmentResponseDto] })
+  @ApiResponse({
+    status: 201,
+    description: 'Files successfully uploaded',
+    type: [AttachmentResponseDto],
+  })
   @ApiResponse({ status: 400, description: 'Invalid file or data' })
   @UseInterceptors(
     FilesInterceptor('files', 10, {
@@ -58,7 +55,10 @@ export class AttachmentsController {
       }),
     }),
   )
-  async upload(@UploadedFiles() files: any[], @Body() dto: UploadAttachmentsDto): Promise<AttachmentResponseDto[]> {
+  async upload(
+    @UploadedFiles() files: any[],
+    @Body() dto: UploadAttachmentsDto,
+  ): Promise<AttachmentResponseDto[]> {
     const results: AttachmentResponseDto[] = [];
     for (const f of files) {
       const r = await this.attachmentsService.registerFile(f, dto.productId ?? null);
@@ -68,12 +68,12 @@ export class AttachmentsController {
   }
 
   @Get('tree')
-  @ApiOperation({ 
-    summary: 'Get directory tree structure', 
-    description: 'Retrieve the hierarchical directory structure of uploaded files' 
+  @ApiOperation({
+    summary: 'Get directory tree structure',
+    description: 'Retrieve the hierarchical directory structure of uploaded files',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Successfully retrieved directory tree',
     schema: {
       type: 'object',
@@ -83,10 +83,10 @@ export class AttachmentsController {
         path: { type: 'string' },
         children: {
           type: 'array',
-          items: { $ref: '#/components/schemas/Node' }
-        }
-      }
-    }
+          items: { $ref: '#/components/schemas/Node' },
+        },
+      },
+    },
   })
   async tree() {
     return this.attachmentsService.buildDirectoryTree();

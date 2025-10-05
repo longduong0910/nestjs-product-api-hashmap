@@ -30,7 +30,7 @@ export class AttachmentsService implements OnModuleInit {
     // ensure uploads dir exists
     try {
       await fs.promises.mkdir(this.uploadsRoot, { recursive: true });
-    } catch (e) {
+    } catch {
       // ignore
     }
   }
@@ -133,7 +133,9 @@ export class AttachmentsService implements OnModuleInit {
           nodes.push({ name: e.name, path: full, type: 'file' });
         }
       }
-      return nodes.sort((a, b) => (a.type === b.type ? a.name.localeCompare(b.name) : a.type === 'folder' ? -1 : 1));
+      return nodes.sort((a, b) =>
+        a.type === b.type ? a.name.localeCompare(b.name) : a.type === 'folder' ? -1 : 1,
+      );
     };
 
     root.children = await walk(this.uploadsRoot);

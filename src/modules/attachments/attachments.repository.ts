@@ -11,7 +11,7 @@ export class AttachmentsRepository {
   ) {}
 
   async create(data: Partial<Attachment>): Promise<Attachment> {
-    const ent = this.repo.create(data as Partial<Attachment>);
+    const ent = this.repo.create(data);
     return this.repo.save(ent);
   }
 
