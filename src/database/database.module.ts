@@ -1,32 +1,27 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as entities from './entities';
+import { Product } from './entities/product.entity';
+import { Attachment } from './entities/attachment.entity';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env',
-    }),
+    ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: +configService.get<number>('DB_PORT', 5432),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_NAME'),
-        entities: Object.values(entities),
-        synchronize: configService.get('TYPEORM_SYNCHRONIZE') === 'true',
-        logging: configService.get('TYPEORM_LOGGING') === 'true',
-        dropSchema: configService.get('TYPEORM_DROP_SCHEMA') === 'true',
-        ssl: configService.get('NODE_ENV') === 'production' ? { rejectUnauthorized: false } : false,
+        host: configService.get('DB_HOST') || 'localhost',
+        port: configService.get('DB_PORT') || 5432,
+        username: configService.get('DB_USER') || 'postgres',
+        password: configService.get('DB_PASSWORD') || 'password',
+        database: configService.get('DB_NAME') || 'productdb',
+        entities: [Product, Attachment],
+        synchronize: true, // Only for development
+        logging: true,
       }),
       inject: [ConfigService],
     }),
   ],
-  exports: [TypeOrmModule],
 })
 export class DatabaseModule {}

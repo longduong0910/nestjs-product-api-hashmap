@@ -9,22 +9,27 @@ import {
   IsIn,
   MaxLength 
 } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateProductDto {
+  @ApiProperty({ description: 'Product SKU', example: 'LP-001', maxLength: 50 })
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)
   sku: string;
 
+  @ApiProperty({ description: 'Product name', example: 'Laptop Pro', maxLength: 255 })
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
   name: string;
 
+  @ApiPropertyOptional({ description: 'Product description', example: 'High-performance laptop for professionals' })
   @IsString()
   @IsOptional()
   description?: string;
 
+  @ApiProperty({ description: 'Product price', example: 1299.99, minimum: 0 })
   @IsNumber()
   @Min(0)
   price: number;
