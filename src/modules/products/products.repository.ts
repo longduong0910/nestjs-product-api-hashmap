@@ -35,9 +35,4 @@ export class ProductsRepository {
     const result = await this.productRepository.delete(id);
     return (result.affected ?? 0) > 0;
   }
-
-  async findByCategory(category: string): Promise<Product[]> {
-    const results = await this.productRepository.find({ where: { category } });
-    return results;
-  }
 }

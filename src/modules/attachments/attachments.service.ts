@@ -75,14 +75,14 @@ export class AttachmentsService implements OnModuleInit {
     });
   }
 
-  async registerFile(file: any, productId?: string | null): Promise<AttachmentResponseDto> {
-    const relPath = path.relative(process.cwd(), file.path);
+  async registerFile(files: any, productId?: string | null, folderPath?: string | null): Promise<AttachmentResponseDto> {
+    const relPath = path.relative(process.cwd(), files.path);
     const saved = await this.attachmentsRepository.create({
       productId: productId ?? null,
-      filename: file.filename,
-      originalName: file.originalname,
-      mimeType: file.mimetype,
-      size: file.size,
+      filename: files.filename,
+      originalName: files.originalname,
+      mimeType: files.mimetype,
+      size: files.size,
       path: relPath,
     } as Partial<Attachment>);
     const d = this.entityToDomain(saved);
@@ -140,5 +140,64 @@ export class AttachmentsService implements OnModuleInit {
 
     root.children = await walk(this.uploadsRoot);
     return root;
+  }
+
+  async registerFileToFolder(file: any, productId?: string | null, folderPath?: string | null): Promise<AttachmentResponseDto> {
+    // Sanitize folder path
+    const sanitizedFolderPath = folderPath ? 
+      folderPath.replace(/[^a-zA-Z0-9\-_\/]/g, '').replace(/\/+/g, '/').replace(/^\/|\/$/g, '') : '';
+    
+    // Create target directory path
+    const targetDir = sanitizedFolderPath ? 
+      path.join(this.uploadsRoot, sanitizedFolderPath) : 
+      this.uploadsRoot;
+
+    // Ensure target directory exists
+    try {
+      await fs.promises.mkdir(targetDir, { recursive: true });
+    } catch (error) {
+      console.error('Failed to create directory:', error);
+      throw new Error(`Failed to create directory: ${targetDir}`);
+    }
+
+    // Generate unique filename
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    const newFileName = `${unique}${ext}`;
+    
+    // Create new file path
+    const newFilePath = path.join(targetDir, newFileName);
+    
+    // Move file to target directory
+    try {
+      await fs.promises.rename(file.path, newFilePath);
+    } catch (error) {
+      // If rename fails, try copy and delete
+      try {
+        await fs.promises.copyFile(file.path, newFilePath);
+        await fs.promises.unlink(file.path);
+      } catch (copyError) {
+        console.error('Failed to move file:', copyError);
+        throw new Error('Failed to move file to target directory');
+      }
+    }
+
+    // Create relative path for database
+    const relPath = path.relative(process.cwd(), newFilePath);
+    
+    // Save to database
+    const saved = await this.attachmentsRepository.create({
+      productId: productId ?? null,
+      filename: newFileName,
+      originalName: file.originalname,
+      mimeType: file.mimetype,
+      size: file.size,
+      path: relPath,
+    } as Partial<Attachment>);
+    
+    const d = this.entityToDomain(saved);
+    const resp = this.domainToResponse(d);
+    this.hashmap.set(resp.path, resp);
+    return resp;
   }
 }

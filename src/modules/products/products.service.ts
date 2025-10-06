@@ -8,26 +8,26 @@ import { Product } from '../../database/entities/product.entity';
 export class ProductsService {
   constructor(private readonly productsRepository: ProductsRepository) {}
 
-  // Inline mapper: Entity -> Domain interface
   private entityToDomain(entity: Product): IProduct {
     return {
       id: entity.id,
       name: entity.name,
       sku: entity.sku,
       price: entity.price,
-      category: entity.category,
-      // include optional fields if present on the entity
-      ...((entity as any).description ? { description: (entity as any).description } : {}),
-      ...((entity as any).createdAt ? { createdAt: (entity as any).createdAt } : {}),
-      ...((entity as any).updatedAt ? { updatedAt: (entity as any).updatedAt } : {}),
+      stockQuantity: entity.stockQuantity,
+      status: entity.status,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+      // Optional fields
+      ...(entity.description && { description: entity.description }),
+      ...(entity.category && { category: entity.category }),
+      ...(entity.thumbnailUrl && { thumbnailUrl: entity.thumbnailUrl }),
+      ...(entity.attributes && { attributes: entity.attributes }),
+      ...(entity.tags && { tags: entity.tags }),
     } as IProduct;
   }
 
   async findAll(query: ProductQueryDto): Promise<IProduct[]> {
-    if (query.category) {
-      const entities = await this.productsRepository.findByCategory(query.category);
-      return entities.map(e => this.entityToDomain(e));
-    }
     const entities = await this.productsRepository.findAll();
     return entities.map(e => this.entityToDomain(e));
   }

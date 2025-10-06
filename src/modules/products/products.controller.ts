@@ -27,10 +27,16 @@ export class ProductsController {
       name: p.name,
       sku: p.sku,
       price: p.price,
-      category: p.category,
-      ...((p as any).description ? { description: (p as any).description } : {}),
-      ...((p as any).createdAt ? { createdAt: (p as any).createdAt } : {}),
-      ...((p as any).updatedAt ? { updatedAt: (p as any).updatedAt } : {}),
+      stockQuantity: p.stockQuantity,
+      status: p.status,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
+      // Optional fields
+      ...(p.description && { description: p.description }),
+      ...(p.category && { category: p.category }),
+      ...(p.thumbnailUrl && { thumbnailUrl: p.thumbnailUrl }),
+      ...(p.attributes && { attributes: p.attributes }),
+      ...(p.tags && { tags: p.tags }),
     } as ProductResponseDto;
   }
 
